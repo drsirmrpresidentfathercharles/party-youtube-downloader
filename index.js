@@ -48,12 +48,12 @@ var encode =  function(data){
 
 app.get('/download/:id', function(request, response) {
 	response.setHeader("Content-Description", "File Transfer");
-	response.setHeader("Content-Type", "audio/m4a");
+	response.setHeader("Content-Type", "video/mp4");
 
-	var downloader = ytdl('https://www.youtube.com/watch?v='+request.params.id, {filter: 'audioonly'});
+	var downloader = ytdl('https://www.youtube.com/watch?v='+request.params.id, {filter:function(format){return format.container==='mp4';}});
 
 	downloader.on("info", function(info, formats){
-		response.setHeader("Content-Disposition", "attachment; filename=\""+(++i)+"_"+encode(info.title)+".m4a\"");
+		response.setHeader("Content-Disposition", "attachment; filename=\""+(++i)+"_"+encode(info.title)+".mp4\"");
 
 		downloader.on("error", function(data){
 			response.end();
@@ -70,21 +70,7 @@ app.get('/download/:id', function(request, response) {
 });
 
 app.get('/stream/:id', function(request, response) {
-	response.setHeader("Content-Description", "File Transfer");
-	response.setHeader("Content-Type", "video/mp4");
-
-	var downloader = ytdl.getInfo('https://www.youtube.com/watch?v='+request.params.id,{filter:function(format){return format.container==='mp4';}}, function(err, info){
-		for(i = 0; i < info.formats.length; i++){
-			response.redirect(info.formats[i].url);
-			break;
-		}
-	});
-
-	/*downloader.on("info", function(info, formats){
-		console.log(formats);
-
-		response.redirect(formats.url);
-	});*/
+	response.end();
 });
 
 app.listen(app.get('port'), function () {
